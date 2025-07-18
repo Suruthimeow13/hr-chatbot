@@ -15,12 +15,6 @@ An interactive Streamlit web app that acts as a virtual hiring assistant by dyna
 
 ---
 
-## Demo Preview
-
-Coming Soon... *(Add a screenshot or GIF of the app here)*
-
----
-
 ## Tech Stack
 
 | Technology        | Role                                 |
