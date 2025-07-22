@@ -1,113 +1,97 @@
-# AI-Powered Hiring Assistant
+#!/bin/bash
 
-An interactive Streamlit web app that acts as a virtual hiring assistant by dynamically generating technical interview questions based on the candidate's tech stack using Hugging Face's `flan-t5-base` model.
+cat << 'EOF' > README.md
+# 🤖 TalentScout Hiring Assistant
 
----
-
-## Features
-
-- Candidate detail form (name, experience, tech stack, etc.)
--  One-question-at-a-time Q&A interaction
-- Next question revealed only after user submits an answer
-- Summary of all questions and answers at the end
-- Fast, responsive interface using Streamlit
-- AI-powered question generation with Hugging Face Transformers
+TalentScout is an AI-powered Streamlit application that simulates a short technical interview round. It generates customized technical questions based on the candidate's tech stack using the `mistralai/Mixtral-8x7B-Instruct` model via [Together.ai](https://together.ai). The app also evaluates each answer using the same model, providing instant feedback.
 
 ---
 
-## Tech Stack
+## 🚀 Features
 
-| Technology        | Role                                 |
-|-------------------|--------------------------------------|
-| Python            | Core programming language            |
-| Streamlit         | Frontend UI & user interaction       |
-| Hugging Face (flan-t5-base) | AI model for question generation |
+- 🔎 Personalized technical question generation
+- ✍️ Candidate information form
+- 🔁 Three-question interview loop (customizable)
+- 🧠 AI-powered answer evaluation (Mixtral)
+- 📥 Ready for CSV export or scoring
+- 💻 Simple and intuitive Streamlit interface
 
 ---
 
-## Getting Started
+## 🛠 Tech Stack
 
-### 1. Clone the Repository
+- Python 3.8+
+- Streamlit
+- Together.ai API (Mixtral model)
+- OpenAI Python SDK (v1+)
+- dotenv
 
-```bash
-git clone https://github.com/YourUsername/ai-hiring-assistant.git
-cd ai-hiring-assistant
-```
+---
 
-### 2. Install Dependencies
+## 📦 Installation
 
-```bash
-pip install streamlit transformers
-```
+Clone the repository and install dependencies:
 
-### 3. Run the App
+\`\`\`bash
+git clone https://github.com/your-username/talent-hiring-assistant.git
+cd talent-hiring-assistant
+pip install -r requirements.txt
+\`\`\`
 
-```bash
+---
+
+## 🔐 Setup API Key
+
+Create a `.env` file in the root directory:
+
+\`\`\`env
+TOGETHER_API_KEY=your_together_api_key_here
+\`\`\`
+
+You can get your free API key from: https://www.together.ai
+
+---
+
+## ▶️ Run the App
+
+\`\`\`bash
 streamlit run app.py
-```
+\`\`\`
 
 ---
 
-## Project Structure
+## 🖼 Screenshot (Optional)
 
-```
-ai-hiring-assistant/
-│
-├── app.py                 # Main Streamlit application
-├── requirements.txt       # Project dependencies
-└── README.md              # This documentation file
-```
+Add a screenshot under `assets/screenshot.png` and uncomment this:
+
+\`\`\`md
+![screenshot](assets/screenshot.png)
+\`\`\`
 
 ---
 
-## How It Works
+## 📁 File Structure
 
-1. User submits their profile and tech stack.
-2. The app generates a technical question related to the input.
-3. After the user answers, the next question is revealed.
-4. This continues for a set number of rounds (default: 3).
-5. A full Q&A summary is displayed at the end.
-
----
-
-## Sample Output
-
-**Q1:** What is the difference between Python lists and tuples?  
-**A1:** Tuples are immutable, while lists can be modified. Tuples also use less memory.
-
-**Q2:** Explain how decorators work in Python.  
-**A2:** Decorators are functions that modify the behavior of other functions without changing their code.
-
-*(…and so on)*
+\`\`\`
+├── app.py                # Main application file
+├── .env                  # Your API key (not pushed)
+├── requirements.txt      # Dependencies
+├── README.md             # Project documentation
+└── assets/               # Optional images
+\`\`\`
 
 ---
 
-## Security & Privacy
+## ✍️ Author
 
-- No external API key is needed.
-- All data is stored in Streamlit's temporary session memory.
-- Suitable for prototyping and local deployment.
-
----
-
-## Future Enhancements
-
-- Store Q&A results in a database
-- Email results to recruiter or candidate
-- Add question difficulty levels
-- Introduce voice-to-text support
+**Suruthivimal**  
+[LinkedIn Profile](https://www.linkedin.com/in/suruthivimal)
 
 ---
 
-## Author
+## 📜 License
 
-**Name**: Suruthivimal  
-**Education**: B.Tech Artificial Intelligence & Data Science  
-**GitHub**: [Suruthimeow13](https://github.com/Suruthimeow13)  
-**LinkedIn**: [Suruthivimal](https://www.linkedin.com/in/suruthivimal)
+This project is licensed under the MIT License.
+EOF
 
----
-
-## License
-
-This project is open-source and available under the [MIT License](LICENSE).
+echo "✅ README.md created successfully!"
