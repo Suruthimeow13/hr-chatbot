@@ -27,6 +27,24 @@ def generate_question(tech_stack):
         return response.choices[0].message.content.strip()
     except Exception as e:
         return f"❌ API error: {e}"
+    
+# Function to evaluate a candidate's answer using Mixtral
+def evaluate_answer(question, answer):
+    prompt = (
+        f"You are a technical interviewer. Here's the question: '{question}' and the candidate's answer: '{answer}'. "
+        "Evaluate the answer briefly (1–2 sentences) and give a rating out of 10."
+    )
+    try:
+        response = client.chat.completions.create(
+            model="mistralai/Mixtral-8x7B-Instruct-v0.1",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.5,
+            max_tokens=150,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        return f"❌ Evaluation error: {e}"
+
 
 # Initialize session state
 st.session_state.setdefault("question_list", [])
@@ -84,10 +102,13 @@ else:
                 st.success("🎉 You've completed the technical round!")
 
     else:
-        st.subheader("📋 Your Responses")
+        st.subheader("📋 Your Responses with Evaluation")
         for idx, qa in enumerate(st.session_state.answers, 1):
             st.markdown(f"**Q{idx}: {qa['question']}**")
             st.markdown(f"**A{idx}: {qa['answer']}**")
+            with st.spinner("Evaluating your answer..."):
+                evaluation = evaluate_answer(qa['question'], qa['answer'])
+                st.markdown(f"🧠 **Evaluation:** {evaluation}")
 
         if st.button("🔁 Start Over"):
             st.session_state.clear()
