@@ -81,13 +81,13 @@ Then open your browser and go to: [http://localhost:8501](http://localhost:8501)
 ## Screenshots
 
 ### Candidate Form
-![Candidate Form](screenshots/candidate_form.png)
+![Candidate Form](candidate_form.png)
 
 ### Technical Questions
-![Technical Questions](screenshots/technical_questions.png)
+![Technical Questions](technical_questions.png)
 
 ### Evaluated Answers
-![Evaluated Answers](screenshots/evaluated_answers.png)
+![Evaluated Answers](evaluated_answers.png)
 
 ---
 
