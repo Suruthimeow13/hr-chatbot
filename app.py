@@ -1,90 +1,99 @@
 import streamlit as st
-from transformers import pipeline
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
 
-# Load Hugging Face model (cache to avoid reloading)
-@st.cache_resource
-def load_model():
-    return pipeline("text2text-generation", model="google/flan-t5-base")
+# Load API key from .env file
+load_dotenv()
+api_key = os.getenv("TOGETHER_API_KEY")
 
-model = load_model()
+# Initialize the OpenAI client
+client = OpenAI(api_key=api_key, base_url="https://api.together.xyz/v1")
 
-# Function to generate technical questions (one at a time)
-def generate_single_question(tech_stack):
-    prompt = f"Generate 1 technical interview question for the following technologies: {tech_stack}."
+# Function to generate a question using Together.ai with Mixtral
+def generate_question(tech_stack):
+    prompt = (
+        f"You are a senior technical interviewer. Generate a challenging and relevant technical "
+        f"interview question based on the following technologies: {tech_stack}. "
+        "Focus on problem-solving or conceptual depth. Do not include an answer."
+    )
     try:
-        response = model(prompt, max_length=128, do_sample=True)[0]["generated_text"]
-        return response.strip()
+        response = client.chat.completions.create(
+            model="mistralai/Mixtral-8x7B-Instruct-v0.1",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7,
+            max_tokens=256
+        )
+        return response.choices[0].message.content.strip()
     except Exception as e:
-        return f"❌ Error: {e}"
+        return f"❌ API error: {e}"
 
-# Initialize session state variables
-if 'question_list' not in st.session_state:
-    st.session_state.question_list = []
-if 'current_q' not in st.session_state:
-    st.session_state.current_q = ""
-if 'answers' not in st.session_state:
-    st.session_state.answers = []
-if 'tech_stack' not in st.session_state:
-    st.session_state.tech_stack = ""
-if 'question_count' not in st.session_state:
-    st.session_state.question_count = 0
-MAX_QUESTIONS = 3  # You can change this to any number
+# Initialize session state
+st.session_state.setdefault("question_list", [])
+st.session_state.setdefault("current_question", "")
+st.session_state.setdefault("answers", [])
+st.session_state.setdefault("tech_stack", "")
+st.session_state.setdefault("question_count", 0)
 
-# Streamlit App UI
-st.title("TalentScout Hiring Assistant 🤖")
-st.write("Hi! I'm your virtual hiring assistant. Let's get started!")
+MAX_QUESTIONS = 3
 
-# User Details Form
-if st.session_state.tech_stack == "":
-    with st.form("candidate_form"):
+# App UI
+st.title("🤖 TalentScout Hiring Assistant")
+st.markdown("Welcome! Let's simulate a short technical round based on your tech stack.")
+
+# Step 1: Candidate Details Form
+if not st.session_state.tech_stack:
+    with st.form("candidate_details"):
+        st.subheader("👤 Candidate Information")
         name = st.text_input("Full Name")
         email = st.text_input("Email Address")
         phone = st.text_input("Phone Number")
         experience = st.number_input("Years of Experience", min_value=0)
-        position = st.text_input("Desired Position(s)")
+        position = st.text_input("Position Applying For")
         location = st.text_input("Current Location")
-        tech_stack = st.text_area("Tech Stack (e.g., Python, Django, MySQL, React)")
-        submitted = st.form_submit_button("Submit")
+        tech_stack = st.text_area("Tech Stack (e.g., Python, React, SQL)", height=100)
 
-    if submitted:
-        st.session_state.tech_stack = tech_stack
-        st.session_state.current_q = generate_single_question(tech_stack)
-        st.success("Thanks! Let’s begin your technical round.")
-        st.rerun()
+        submitted = st.form_submit_button("Start Interview")
+        if submitted and tech_stack.strip():
+            st.session_state.tech_stack = tech_stack.strip()
+            st.session_state.current_question = generate_question(tech_stack)
+            st.success("✅ Interview started!")
+            st.rerun()
 
-# Question and Answer Loop
+# Step 2: Technical Interview Loop
 else:
     if st.session_state.question_count < MAX_QUESTIONS:
-        st.markdown(f"### Question {st.session_state.question_count + 1}")
-        st.markdown(f"**{st.session_state.current_q}**")
+        st.markdown(f"### 🔹 Question {st.session_state.question_count + 1}")
+        st.markdown(f"**{st.session_state.current_question}**")
 
         with st.form("answer_form"):
-            answer = st.text_area("Your Answer")
+            answer = st.text_area("✍️ Your Answer", height=150)
             answered = st.form_submit_button("Submit Answer")
 
-        if answered:
+        if answered and answer.strip():
             st.session_state.answers.append({
-                "question": st.session_state.current_q,
-                "answer": answer
+                "question": st.session_state.current_question,
+                "answer": answer.strip()
             })
             st.session_state.question_count += 1
 
             if st.session_state.question_count < MAX_QUESTIONS:
-                st.session_state.current_q = generate_single_question(st.session_state.tech_stack)
+                st.session_state.current_question = generate_question(st.session_state.tech_stack)
                 st.rerun()
             else:
-                st.success("✅ You've completed all questions!")
-                st.write("### Your Responses")
-                for idx, qa in enumerate(st.session_state.answers, 1):
-                    st.markdown(f"**Q{idx}: {qa['question']}**")
-                    st.markdown(f"**A{idx}: {qa['answer']}**")
+                st.success("🎉 You've completed the technical round!")
+
     else:
-        st.info("Interview completed.")
-        if st.button("Start Over"):
+        st.subheader("📋 Your Responses")
+        for idx, qa in enumerate(st.session_state.answers, 1):
+            st.markdown(f"**Q{idx}: {qa['question']}**")
+            st.markdown(f"**A{idx}: {qa['answer']}**")
+
+        if st.button("🔁 Start Over"):
             st.session_state.clear()
             st.rerun()
 
-# Optional exit interaction
-user_input = st.text_input("Say something (or type 'exit' to end):")
+# Optional: Friendly exit
+user_input = st.text_input("💬 Say something (type 'exit' to finish):")
 if user_input.lower() == "exit":
-    st.write("Thank you! We'll get back to you soon.")
+    st.write("Thanks for your time! We’ll be in touch. 👋")
