@@ -56,7 +56,7 @@ st.session_state.setdefault("question_count", 0)
 MAX_QUESTIONS = 3
 
 # App UI
-st.title("🤖 TalentScout Hiring Assistant")
+st.title("🤖 TalentScout Technical Interview Assistant")
 st.markdown("Welcome! Let's simulate a short technical round based on your tech stack.")
 
 # Step 1: Candidate Details Form
